@@ -1,5 +1,7 @@
+# --- STAGE 1: Build Flet Web with uv ---
 FROM python:3.12-slim AS builder
 
+# Copy official uv binary
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /app
@@ -16,7 +18,7 @@ RUN uv sync --frozen || uv sync
 
 COPY . .
 
-RUN uv run flet build web
+RUN uv run flet build web --yes
 
 FROM nginx:alpine
 
