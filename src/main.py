@@ -55,4 +55,4 @@ async def main(page: ft.Page):
         navigate("/dashboard")
 
 if __name__ == "__main__":
-    ft.run(main)
+    ft.run(main, assets_dir="assets")
