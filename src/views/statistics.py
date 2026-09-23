@@ -1,9 +1,7 @@
 import flet as ft
 import flet_charts as fch
-from services.api import api_client
-from services.storage import get_currency_symbol
 
-def StatisticsView(page: ft.Page, navigate) -> ft.View:
+def StatisticsView(page: ft.Page, navigate, app_storage, api_client) -> ft.View:
     transactions = []
     is_loading = True
 
@@ -55,7 +53,7 @@ def StatisticsView(page: ft.Page, navigate) -> ft.View:
         render_statistics()
 
     def render_statistics():
-        curr_symbol = get_currency_symbol()
+        curr_symbol = app_storage.get_currency_symbol()
         category_totals = {}
         total_expenses = 0.0
 

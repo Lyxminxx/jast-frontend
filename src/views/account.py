@@ -1,8 +1,6 @@
 import flet as ft
-from services.api import api_client
-from services.storage import get_currency_symbol, set_currency_symbol
 
-def AccountView(page: ft.Page, navigate) -> ft.View:
+def AccountView(page: ft.Page, navigate, app_storage, api_client) -> ft.View:
     user_info = {}
 
     # Form Fields: Dark containers with crisp white text
@@ -22,7 +20,7 @@ def AccountView(page: ft.Page, navigate) -> ft.View:
     
     currency_in = ft.TextField(
         label="Currency Symbol (e.g. kr, $, €)",
-        value=get_currency_symbol(),
+        value=app_storage.get_currency_symbol(),
         **input_style,
     )
 
@@ -92,7 +90,7 @@ def AccountView(page: ft.Page, navigate) -> ft.View:
         c_val = currency_in.value.strip() or "kr"
 
         # Save currency locally
-        set_currency_symbol(c_val)
+        app_storage.set_currency_symbol(c_val)
 
         ok, res = api_client.update_me(
             username=u_val or None,

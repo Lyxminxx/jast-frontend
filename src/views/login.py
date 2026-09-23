@@ -1,10 +1,7 @@
 import flet as ft
-from services.api import api_client
-from services.storage import get_setting, remove_setting
 
-
-def LoginView(page: ft.Page, navigate) -> ft.View:
-    server_url = get_setting("server_url") or "Not Configured"
+def LoginView(page: ft.Page, navigate, app_storage, api_client) -> ft.View:
+    server_url = app_storage.get_setting("server_url") or "Not Configured"
 
     # Input controls
     username_input = ft.TextField(
@@ -41,7 +38,7 @@ def LoginView(page: ft.Page, navigate) -> ft.View:
         status_text.value = ""
         page.update()
 
-        # Call Django authentication endpoint
+        # Call Django authentication endpoint using the passed client
         success, message = api_client.login(username, password)
 
         loading_ring.visible = False
@@ -62,7 +59,7 @@ def LoginView(page: ft.Page, navigate) -> ft.View:
     )
 
     def change_server(e):
-        remove_setting("server_url")
+        app_storage.remove_setting("server_url")
         navigate("/server")
 
     return ft.View(

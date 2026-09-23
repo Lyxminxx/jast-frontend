@@ -1,8 +1,7 @@
 import flet as ft
-from services.storage import save_setting
 
-
-def ServerPickerView(page: ft.Page, navigate) -> ft.View:
+# Including api_client parameter here to match the routing mapping in main.py seamlessly
+def ServerPickerView(page: ft.Page, navigate, app_storage, api_client=None) -> ft.View:
     # 1. Set width to 140px so "https://" fits comfortably alongside the dropdown arrow
     protocol_dropdown = ft.Dropdown(
         value="https://",
@@ -45,7 +44,7 @@ def ServerPickerView(page: ft.Page, navigate) -> ft.View:
         protocol = protocol_dropdown.value
         final_url = f"{protocol}{raw_host}/api"
 
-        save_setting("server_url", final_url)
+        app_storage.save_setting("server_url", final_url)
         navigate("/login")
 
     return ft.View(

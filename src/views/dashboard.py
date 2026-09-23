@@ -1,9 +1,7 @@
 from datetime import datetime
 import flet as ft
-from services.api import api_client
-from services.storage import get_currency_symbol
 
-def DashboardView(page: ft.Page, navigate) -> ft.View:
+def DashboardView(page: ft.Page, navigate, app_storage, api_client) -> ft.View:
     transactions = []
     categories = []
     user_info = {}
@@ -43,7 +41,7 @@ def DashboardView(page: ft.Page, navigate) -> ft.View:
     )
     
     amount_in = ft.TextField(
-        label=f"Amount ({get_currency_symbol()})", 
+        label=f"Amount ({app_storage.get_currency_symbol()})", 
         keyboard_type=ft.KeyboardType.NUMBER, 
         expand=True
     )
@@ -126,7 +124,7 @@ def DashboardView(page: ft.Page, navigate) -> ft.View:
         nonlocal editing_tx_id
         editing_tx_id = None
         modal_title.value = "Add Transaction"
-        amount_in.label = f"Amount ({get_currency_symbol()})"
+        amount_in.label = f"Amount ({app_storage.get_currency_symbol()})"
         
         title_in.value = ""
         amount_in.value = ""
@@ -148,7 +146,7 @@ def DashboardView(page: ft.Page, navigate) -> ft.View:
         nonlocal editing_tx_id
         editing_tx_id = tx["id"]
         modal_title.value = "Edit Transaction"
-        amount_in.label = f"Amount ({get_currency_symbol()})"
+        amount_in.label = f"Amount ({app_storage.get_currency_symbol()})"
         
         title_in.value = tx.get("title", "")
         amt_val = float(tx.get("amount", 0))
@@ -252,7 +250,7 @@ def DashboardView(page: ft.Page, navigate) -> ft.View:
         render_dashboard()
 
     def render_dashboard():
-        curr_symbol = get_currency_symbol()
+        curr_symbol = app_storage.get_currency_symbol()
         total_spent = sum(float(t.get("amount", 0)) for t in transactions)
         current_balance_text.value = f"{total_spent:,.2f} {curr_symbol}"
 

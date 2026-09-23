@@ -1,44 +1,39 @@
-import json
-from pathlib import Path
+import flet as ft
 
-STORAGE_FILE = Path("settings.json")
+class AppStorage:
+    def __init__(self, page: ft.Page):
+        self.page = page
+        self.prefs = ft.SharedPreferences()
+        self._cache = {}
 
+    async def init(self):
+        # Only look for our exact keys, ignoring hidden browser data
+        app_keys = ["server_url", "auth_token", "refresh_token", "currency_symbol"]
+        
+        for k in app_keys:
+            if await self.prefs.contains_key(k):
+                self._cache[k] = str(await self.prefs.get(k))
 
-def save_setting(key: str, value: str) -> None:
-    data = {}
-    if STORAGE_FILE.exists():
-        try:
-            data = json.loads(STORAGE_FILE.read_text())
-        except Exception:
-            data = {}
-    data[key] = value
-    STORAGE_FILE.write_text(json.dumps(data, indent=2))
+    def save_setting(self, key: str, value: str) -> None:
+        self._cache[key] = value
+        self.page.run_task(self._async_save, key, value)
 
+    async def _async_save(self, key, value):
+        await self.prefs.set(key, str(value))
 
-def get_setting(key: str, default: str | None = None) -> str | None:
-    if not STORAGE_FILE.exists():
-        return default
-    try:
-        data = json.loads(STORAGE_FILE.read_text())
-        return data.get(key, default)
-    except Exception:
-        return default
+    def get_setting(self, key: str, default: str | None = None) -> str | None:
+        return self._cache.get(key, default)
 
+    def remove_setting(self, key: str) -> None:
+        if key in self._cache:
+            del self._cache[key]
+        self.page.run_task(self._async_remove, key)
 
-def remove_setting(key: str) -> None:
-    if STORAGE_FILE.exists():
-        try:
-            data = json.loads(STORAGE_FILE.read_text())
-            if key in data:
-                del data[key]
-                STORAGE_FILE.write_text(json.dumps(data, indent=2))
-        except Exception:
-            pass
+    async def _async_remove(self, key):
+        await self.prefs.remove(key)
 
+    def get_currency_symbol(self) -> str:
+        return self.get_setting("currency_symbol") or "kr"
 
-def get_currency_symbol() -> str:
-    return get_setting("currency_symbol") or "kr"
-
-
-def set_currency_symbol(symbol: str) -> None:
-    save_setting("currency_symbol", symbol)
+    def set_currency_symbol(self, symbol: str) -> None:
+        self.save_setting("currency_symbol", symbol)
